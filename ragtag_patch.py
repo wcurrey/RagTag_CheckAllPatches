@@ -388,37 +388,64 @@ def main():
     # Check if any alignments are left
     if not ctg_alns:
         raise RuntimeError("There are no alignments. Check '{}'.".format(output_path + file_prefix + ".asm.paf"))
+"""
+Ok this is going to be a big set of edits:
 
+The original code is shown in the 'else' block within for i in ctg_alns:
+THE ISSUE HERE IS ContigAlignment.UNIQUE_ANCHOR_FILTER()
+
+currently my method does not check for unique anchors. I need to test filtering these AFTER the filter and merge,
+and I need to test checking each one individually
+"""
     # Filter the alignments
     unfiltered_strings, filtered_strings, merged_strings, useful_strings = [], [], [], []
     log("INFO", "Filtering and merging alignments")
     fltrd_ctg_alns = dict()
     for i in ctg_alns:
-        # Unique anchor filtering
-        unfiltered_strings.append(str(ctg_alns[i]))
-        ctg_alns[i] = ctg_alns[i].unique_anchor_filter(min_ulen, keep_small=keep_small_uniques)
-
-        # mapq filtering
-        if ctg_alns[i] is not None:
-            ctg_alns[i] = ctg_alns[i].filter_mapq(min_mapq)
+        if check_joins:
+            # mapq filter
             if ctg_alns[i] is not None:
-                filtered_strings.append(str(ctg_alns[i]))
-
-                # alignment merging
-                ctg_alns[i] = ctg_alns[i].merge_alns(merge_dist=merge_dist, careful_merge=True)
+                ctg_alns[i] = ctg_alns[i].filter_mapq(min_mapq)
                 if ctg_alns[i] is not None:
-                    merged_strings.append(str(ctg_alns[i]))
+                    filtered_strings.append(str(ctg_alns[i]))
 
-                    # Length filtering
-                    ctg_alns[i] = ctg_alns[i].filter_lengths(min_sup_aln_len)
+                    # alignment merging BE CAREFUL THE careful_merge=False could cause problems where there's a structural variant on our sequence
+                    ctg_alns[i] = ctg_alns[i].merge_alns(merge_dist=merge_dist, careful_merge=False)
                     if ctg_alns[i] is not None:
-                        # terminal filtering
-                        ctg_alns[i] = ctg_alns[i].keep_terminals(max_term_dist)
+                        merged_strings.append(str(ctg_alns[i]))
 
-                        # Save the remaining useful alignments
-                        if ctg_alns[i] is not None and ctg_alns[i].num_refs > 1 and not ctg_alns[i].has_internal_ref_cuttings(max_term_dist):
-                            useful_strings.append(str(ctg_alns[i]))
-                            fltrd_ctg_alns[i] = ctg_alns[i]
+                        # Length filtering
+                        ctg_alns[i] = ctg_alns[i].filter_lengths(min_sup_aln_len)
+                        if ctg_alns[i] is not None:
+                            # terminal filtering
+                            ctg_alns[i] = ctg_alns[i].keep_terminals(max_term_dist)
+            
+        else:
+            # Unique anchor filtering
+            unfiltered_strings.append(str(ctg_alns[i]))
+            ctg_alns[i] = ctg_alns[i].unique_anchor_filter(min_ulen, keep_small=keep_small_uniques)
+
+            # mapq filtering
+            if ctg_alns[i] is not None:
+                ctg_alns[i] = ctg_alns[i].filter_mapq(min_mapq)
+                if ctg_alns[i] is not None:
+                    filtered_strings.append(str(ctg_alns[i]))
+
+                    # alignment merging
+                    ctg_alns[i] = ctg_alns[i].merge_alns(merge_dist=merge_dist, careful_merge=True)
+                    if ctg_alns[i] is not None:
+                        merged_strings.append(str(ctg_alns[i]))
+
+                        # Length filtering
+                        ctg_alns[i] = ctg_alns[i].filter_lengths(min_sup_aln_len)
+                        if ctg_alns[i] is not None:
+                            # terminal filtering
+                            ctg_alns[i] = ctg_alns[i].keep_terminals(max_term_dist)
+    
+                            # Save the remaining useful alignments
+                            if ctg_alns[i] is not None and ctg_alns[i].num_refs > 1 and not ctg_alns[i].has_internal_ref_cuttings(max_term_dist):
+                                useful_strings.append(str(ctg_alns[i]))
+                                fltrd_ctg_alns[i] = ctg_alns[i]
 
     # Write debugging files
     debug_non_fltrd_file = output_path + file_prefix + ".debug.unfiltered.paf"
