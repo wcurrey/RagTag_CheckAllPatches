@@ -1,0 +1,120 @@
+"""
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Apr. 12, 2024
+# # Began Fork
+# # Added argument --check-joins to ragtag_patch.py 
+# # Made warning that this is not compatible with fills
+# # Created modification_notes.txt to hold edits
+# # Started reviewing data structure of scaffold graphs
+    # ScaffoldGraphBase 
+      # # nodes -- strings ending in "_b" or "_e" correspond
+        # to the beginnings and ends of contigs
+      # # edges -- define weight and metadata connecting 
+        # contigs
+        
+    # MultiScaffoldGraph
+      # # used in scaffolding applications where adjacencies
+        # are supported by multiple pieces of evidence, e.g.
+        # multiple AGP files or multiple ultra long reads
+      --- This may be a good way to incorporate verification
+      ~ ~ merge(self)
+        ~ Combine edges connecting the same nodes, return
+        ~ a new SG graph
+        
+    # ScaffoldGraph
+      # # inherits from ScaffoldGraphBase, adds
+        # functionality that doesn't work in Multi, utilities
+        # to compute scaffolding solutions
+        
+    # AGPMultiScaffoldGraph 
+      # # Inherits from MultiScaffoldGraph, AGP-specific
+        # Draws upon AssemblyPoint object to build graph,
+        # including for unknown orientations
+      ~ ~ __init__() builds graph from fasta (typically $path.ctg.fasta)
+      ~ ~ _get_assembly_points(self, agp, weight)
+        ~ reads all adjacencies defined by a single AGP
+        ~ file, yielding them as APs weighted by 'weight'
+      ~ ~ add_agps(self, in_agps, in_weights=None, exclusion_set=None)
+        ~ zips in_agps with in_weights and iterates over the 
+        ~ combination, using self._get_assembly_points(agp, weight)
+        ~ Then run ap.get_realizations() and add each as a new
+        ~ edge
+        
+    # AssemblyPoint (AP)
+      # # Represents a sequence adjacency between two 
+        # sequences with independent orientations
+      # # Attributes include confidence value
+        # known or unknown size?
+        # Length?
+        # What kind of gap?
+        # What evidence?
+    # PatchScaffoldGraph
+      # # Directed scaffold graph, DOES NOT INHERIT
+      # # 
+# # Reviewed ragtag_patch.py
+    ~ read_genome_alignments(aln_file, query_blacklist, ref_black_list)
+    ~ ~ Uses PAFReader(aln_file) to read in alignments
+      ~ Then it stores these to a dictionary
+      ~ keys are query sequences, values are lists of
+      ~ alignment details for each one corresponding to the
+      ~ query, irrespective of reference sequence
+      ~ THEN it stores the final dict with each query 
+      ~ corresponding to a ContigAlignment object
+      
+    ~ main()
+    ~ ~ begins with parameter validation
+      ~ this ends line ~300
+      ~ breaks reference (contig) assembly at gaps
+      ~ ~ sends to .ctg.agp and .ctg.fasta
+      ~ ~ using ragtag_splitasm.py
+      ~ renames query (validated reference) sequences
+      ~ ~ sends to .rename.agp and .rename.fasta
+      ~ ~ using ragtag_rename.py
+      ~ combines both for components fasta
+      ~ ~ writes to .comps.fasta
+      ~ ~ using pysam.FastaFile to read
+      ~ This prelude finishes line ~370
+      ~
+      ~ Maps query (validated reference) to reference contigs
+      ~ converts to PAF if using Nucmer
+      ~ reads in alignments, 
+      ~ ~ Uses read_genome_alignments()
+      ~ ~ Stores to dict of ContigAlignment objects
+      ~ filters the alignments by:
+        - unique length > 1kb
+        - mapq > 10
+      ~ merge alignments, then filter by:
+        - total length > 50kb
+        - within 5% of contig terminal
+      ~
+      ~ line 468
+      ~ make AGPMultiScaffoldGraph from original ref contig adjacencies
+      ~ merge() to make a ScaffoldGraph
+      ~ make PatchScaffoldGraph from this
+      ~ make PatchScaffoldGraph from alignments
+      
+!# # Reviewed ContigAlignment.py
+!    # ONE self.query_header and self.query_length for each
+!    # remaining PAF fields stored in 10 lists, one for 
+!    # each field
+!    ~ unique_anchor_filter() !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!    ~ ~ uses ragtag_utilities/utilities.py summarize_planesweep()
+!      ~ summarize_planesweep()
+!          ~ returns the sections of alignments that are unique IF 
+          ~ they're long enough (>1000 bp)
+    ~ merge_alns()
+    ~ ~ merges close alignments to the same ref
+    ~ ~ checks for only short gaps on the ref default
+    ~ ~ checks for short ref AND query gaps if careful_merge=True
+    ~ filter_mapq(self, q)
+    ~ ~ remove alns with quality < q
+    ~ filter_lengths(self, l)
+    ~ ~ remove alns shorter than length l
+    ~ keep_terminals(self, max_term_dist)
+    ~ ~ filters to alignments < max_term distance from
+    ~ ~ reference terminals
+    
+
+          
+      
+"""
