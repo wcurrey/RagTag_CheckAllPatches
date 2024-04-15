@@ -101,7 +101,10 @@ def build_aln_scaffold_graph(ctg_alns, components_fn, max_term_dist):
     
     from a single query sequence, check what ref/query termini are close
     determine strand direction
-    
+
+    LATER They limit by whether neighbors match. 
+    Let's bring that forward to this step, and if a sequence is missing from the filtered alignments, 
+    we link each of its neighbors as the closest
     
     """
     for query_seq in ctg_alns:
@@ -443,7 +446,7 @@ def main():
                     filtered_strings.append(str(ctg_alns[i]))
 
                     # alignment merging
-                    ctg_alns[i] = ctg_alns[i].merge_alns(merge_dist=merge_dist, careful_merge=True)
+                    ctg_alns[i] = ctg_alns[i].merge_alns(merge_dist=merge_dist, careful_merge=True) ## CHANGED CAREFUL MERGE TO TEST
                     if ctg_alns[i] is not None:
                         merged_strings.append(str(ctg_alns[i]))
 
@@ -499,6 +502,31 @@ def main():
         )
         agp_psg.add_edge(u, v, aln)
 
+    # Set up expected order of contigs 
+    expected_edges = []
+    missing_tigs = []
+    for seq in agp_psg.nodes:
+        seq_aln = False
+        seq_edges = []
+        for i in fltrd_ctg_alns:
+            if seq in fltrd_ctg_alns[i]._ref_seq_headers:
+                seq_aln = True
+        if not seq_aln:
+            missing_tigs.append(i)
+    for seq in missing_tigs:
+        u, v = agp_psg.neighbors(seq)
+    for u, v in agp_psg.edges:
+        if u not in missing_tigs and v not in missing_tigs:
+            expected_edges.append((u,v))
+        else:
+            if u in missing_tigs and v in missing_tigs:
+                pass
+            elif u in missing_tigs:
+                pass
+            else:
+                pass
+        last = (u,v)
+        
     # Make a second directed scaffold graph from the alignments
     log("INFO", "Building a scaffold graph from the target/query mappings")
     aln_psg = build_aln_scaffold_graph(fltrd_ctg_alns, components_fn, max_term_dist)
