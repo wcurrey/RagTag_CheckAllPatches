@@ -363,7 +363,8 @@ class ContigAlignment:
         Fork: added keep_short_tigs to retain contigs shorter than l IF they're wholly contained in query
         """
         if keep_short_tigs:
-            hits = [i for i in range(len(self._ref_headers)) if self._ref_aln_lens[i] >= l or self._aln_lens[i] == self._ref_ends[i]]
+            print("this is to confirm --keep-short-tigs is working")
+            hits = [i for i in range(len(self._ref_headers)) if self._ref_aln_lens[i] >= l or self._aln_lens[i] == self._ref_lens[i]]
         else:
             hits = [i for i in range(len(self._ref_headers)) if self._ref_aln_lens[i] >= l]
         return self._update_alns(hits)
