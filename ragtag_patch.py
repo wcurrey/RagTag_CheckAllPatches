@@ -283,7 +283,7 @@ def main():
     if fill_only and join_only:
         raise ValueError("'--fill-only' and '--join-only' cannot be used together")
     if fill_only and check_joins:
-        raise Warning("'--fill-only' and '--check-joins' are not compatible.")
+        log("WARNING", "'--fill-only' and '--check-joins' are not compatible.")
 
     # I/O parameters
     add_suffix = args.u
