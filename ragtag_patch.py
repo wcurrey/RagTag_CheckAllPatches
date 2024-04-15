@@ -94,16 +94,16 @@ def build_aln_scaffold_graph(ctg_alns, components_fn, max_term_dist):
     :return: PatchScaffoldGraph
     """
     sg = PatchScaffoldGraph(components_fn)
-"""
-Ok looking at how this works to think about building it out with a MultiDiGraph
-
-starts from PatchScaffoldGraph(components_fn) to set component lengths
-
-from a single query sequence, check what ref/query termini are close
-determine strand direction
-
-
-"""
+    """
+    Ok looking at how this works to think about building it out with a MultiDiGraph
+    
+    starts from PatchScaffoldGraph(components_fn) to set component lengths
+    
+    from a single query sequence, check what ref/query termini are close
+    determine strand direction
+    
+    
+    """
     for query_seq in ctg_alns:
         als = ctg_alns[query_seq]
         als.sort_by_query()
