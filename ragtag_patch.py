@@ -454,6 +454,7 @@ def main():
                             # Save the remaining useful alignments
                             #if ctg_alns[i] is not None and ctg_alns[i].num_refs > 1 and not ctg_alns[i].has_internal_ref_cuttings(max_term_dist):
                             if ctg_alns[i] is not None and ctg_alns[i].num_refs > 1:
+                                ctg_alns[i] = ctg_alns[i].filter_internal_ref_cuttings(max_term_dist)
                                 useful_strings.append(str(ctg_alns[i]))
                                 fltrd_ctg_alns[i] = ctg_alns[i]
 
