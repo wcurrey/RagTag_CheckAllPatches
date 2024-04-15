@@ -1,6 +1,34 @@
 """
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # Apr. 15, 2024
+ran debug patch
+saw there were still plenty of good alignments at the merge
+working theory: ctg_alns[i].has_internal_ref_cuttings(max_term_dist)
+filters out all alignments since they're fully embedded in query sequences
+changed --check-joins to default to false
+
+Ok switching gears now that I'm getting a better sense of where alns are actually filtered
+...
+I updated ContigAlignment.filter_lengths() to include short alignments IF the contig is wholly contained in the query sequence
+I changed ragtag_patch.py main() to filter specific alignments rather than whole query sequences
+now ContigAlignment.filter_internal_ref_cuttings()
+used to be ContigAlignment.has_internal_ref_cuttings()
+This is still causing problems. Because structural variants SHOULD be common in this region,
+I'm dropping the filter for now. It's breaking the most contiguous, well supported sequence
+we have. 
+
+Also:
+    noticing that my test data set may not be the most filtered set of contigs, I'm going to go back a step in the process, and run filtered contigs > read based scaffolding > reference based patching WITHOUT reference based scaffolding to see how that works, while it runs I'll mark up some potential edits to the ragtag code
+
+This test will use --keep-short-tigs and no internal_ref_cuttings filter
+All reference haplotypes will be included for patching
+
+Trying to retouch build_aln_scaffold_graph()
+
+seeing cleaner results with ntLink providing gap-filling, but it's still not perfect
+Need to circle back to testing out how to leverage known scaffolds more
+need to see how we would build a read-alignment QC stage to determine final path
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # Apr. 12, 2024
