@@ -94,7 +94,16 @@ def build_aln_scaffold_graph(ctg_alns, components_fn, max_term_dist):
     :return: PatchScaffoldGraph
     """
     sg = PatchScaffoldGraph(components_fn)
+"""
+Ok looking at how this works to think about building it out with a MultiDiGraph
 
+starts from PatchScaffoldGraph(components_fn) to set component lengths
+
+from a single query sequence, check what ref/query termini are close
+determine strand direction
+
+
+"""
     for query_seq in ctg_alns:
         als = ctg_alns[query_seq]
         als.sort_by_query()
@@ -443,7 +452,8 @@ and I need to test checking each one individually
                             ctg_alns[i] = ctg_alns[i].keep_terminals(max_term_dist)
     
                             # Save the remaining useful alignments
-                            if ctg_alns[i] is not None and ctg_alns[i].num_refs > 1 and not ctg_alns[i].has_internal_ref_cuttings(max_term_dist):
+                            #if ctg_alns[i] is not None and ctg_alns[i].num_refs > 1 and not ctg_alns[i].has_internal_ref_cuttings(max_term_dist):
+                            if ctg_alns[i] is not None and ctg_alns[i].num_refs > 1:
                                 useful_strings.append(str(ctg_alns[i]))
                                 fltrd_ctg_alns[i] = ctg_alns[i]
 
