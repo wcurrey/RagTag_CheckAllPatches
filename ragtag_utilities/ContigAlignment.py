@@ -353,9 +353,14 @@ class ContigAlignment:
             self._mapqs + [in_mapq]
         )
 
-    def filter_lengths(self, l):
-        """ Remove alignments shorter than l. """
-        hits = [i for i in range(len(self._ref_headers)) if self._ref_aln_lens[i] >= l]
+    def filter_lengths(self, l, keep_short_tigs):
+        """ Remove alignments shorter than l.
+        Fork: added keep_short_tigs to retain contigs shorter than l IF they're wholly contained in query
+        """
+        if keep_short_tigs:
+            hits = [i for i in range(len(self._ref_headers)) if self._ref_aln_lens[i] >= l or self._aln_lens[i] == self._ref_ends[i]]
+        else:
+            hits = [i for i in range(len(self._ref_headers)) if self._ref_aln_lens[i] >= l]
         return self._update_alns(hits)
 
     def filter_mapq(self, q):
