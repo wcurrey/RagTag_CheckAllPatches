@@ -176,7 +176,12 @@ class ContigAlignment:
     def _get_ref_alns(self, r):
         """ Provide the offsets for alignments to a specified reference sequence. """
         return [i for i in range(len(self._ref_headers)) if self._ref_headers[i] == r]
-
+        
+    def _exclude_ref_alns(self, r):
+        """ Provide the offsets for alignments not to specific reference sequences. """
+        hits = [i for i in range(len(self._ref_headers)) if self._ref_headers[i] not in r]
+        return hits
+        
     def _get_best_ref_alns(self):
         """ Provide the offsets for alignments to the 'best' reference sequence. """
         return self._get_ref_alns(self.best_ref_header)
@@ -578,16 +583,21 @@ class ContigAlignment:
             # For each reference/query alignment terminus, determine if it is close to the sequence terminus
             ref_left_end, ref_right_end = self.ref_start_end(i, max_term_dist)
             query_left_end, query_right_end = self.query_start_end(i, max_term_dist)
+            badrefs = []
 
             if not query_left_end and not query_right_end:
                 if not ref_left_end or not ref_right_end:
-                    pass
-                else:
-                    out_indices.append(i)
-            else:
-                out_indices.append(i)
-                    
-        return self._update_alns(out_indices)
+                    if self._ref_headers[i] not in badrefs:
+                        badrefs.append(self._ref_headers[i])
+                #else:
+                #    out_indices.append(i)
+            #else:
+            #    out_indices.append(i)
+        
+        #return self._update_alns(out_indices)
+        hits = self._exclude_ref_alns(badrefs)
+        return self._update_alns(hits)
+
             
     
     def has_internal_ref_cuttings(self, max_term_dist):
