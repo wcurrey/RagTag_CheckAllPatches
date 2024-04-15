@@ -202,6 +202,7 @@ def main():
     patch_options.add_argument("--fill-only", action="store_true", default=False, help="only fill existing target gaps. do not join target sequences")
     patch_options.add_argument("--join-only", action="store_true", default=False, help="only join and patch target sequences. do not fill existing gaps")
     patch_options.add_argument("--check-joins", action="store_true", default=False, help="uses modified check to resolve conflicting joins") #IMPORTANT
+    patch_options.add_argument("--keep-short-tigs", action="store_true", default=False, help="retains contigs entirely contained in query if they're shorter than -s") #IMPORTANT
     
     io_options = parser.add_argument_group("input/output options")
     io_options.add_argument("-o", metavar="PATH", type=str, default="ragtag_output", help="output directory [./ragtag_output]")
@@ -282,6 +283,7 @@ def main():
     # Supporting alignment parameters
     min_sup_aln_len = args.s
     max_term_dist = args.i
+    keep_short_tigs = args.keep_short_tigs
     if max_term_dist <= 0:
         raise ValueError("-i must be a positive nonzero number.")
 
@@ -446,7 +448,7 @@ def main():
                         merged_strings.append(str(ctg_alns[i]))
 
                         # Length filtering
-                        ctg_alns[i] = ctg_alns[i].filter_lengths(min_sup_aln_len)
+                        ctg_alns[i] = ctg_alns[i].filter_lengths(min_sup_aln_len, keep_short_tigs)
                         if ctg_alns[i] is not None:
                             # terminal filtering
                             ctg_alns[i] = ctg_alns[i].keep_terminals(max_term_dist)
