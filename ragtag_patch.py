@@ -201,7 +201,7 @@ def main():
     patch_options.add_argument("-i", metavar="FLOAT", type=float, default=0.05, help="maximum merged alignment distance from sequence terminus. fraction of the sequence length if < 1 [0.05]")
     patch_options.add_argument("--fill-only", action="store_true", default=False, help="only fill existing target gaps. do not join target sequences")
     patch_options.add_argument("--join-only", action="store_true", default=False, help="only join and patch target sequences. do not fill existing gaps")
-    patch_options.add_argument("--check-joins", action="store_true", default=True, help="uses modified check to resolve conflicting joins") #IMPORTANT
+    patch_options.add_argument("--check-joins", action="store_true", default=False, help="uses modified check to resolve conflicting joins") #IMPORTANT
     
     io_options = parser.add_argument_group("input/output options")
     io_options.add_argument("-o", metavar="PATH", type=str, default="ragtag_output", help="output directory [./ragtag_output]")
