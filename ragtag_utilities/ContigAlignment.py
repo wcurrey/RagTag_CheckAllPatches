@@ -562,7 +562,29 @@ class ContigAlignment:
             max_term_dist = max_term_dist * self.ref_lens[aln_idx]
 
         return self.query_starts[aln_idx] <= max_term_dist, (self.query_len - self.query_ends[aln_idx]) <= max_term_dist
+    
+    def filter_internal_ref_cuttings(self, max_term_dist):
+        """
+        Reworking the original has_internal_ref_cuttings function to eliminate ONLY those alignments 
+        that don't work, not all alignments for a given query sequence
+        """
+        out_indices = []
+        for i in range(self.num_alns):
+            # For each reference/query alignment terminus, determine if it is close to the sequence terminus
+            ref_left_end, ref_right_end = self.ref_start_end(i, max_term_dist)
+            query_left_end, query_right_end = self.query_start_end(i, max_term_dist)
 
+            if not query_left_end and not query_right_end:
+                if not ref_left_end or not ref_right_end:
+                    pass
+                else:
+                    out_indices.append(i)
+            else:
+                out_indices.append(i)
+                    
+        return self._update_alns(out_indices)
+            
+    
     def has_internal_ref_cuttings(self, max_term_dist):
         """
         This is when a reference sequence is well contained within a query sequence, yet there are parts of the
@@ -570,6 +592,7 @@ class ContigAlignment:
         :return:
         """
         self.sort_by_query()
+
         for i in range(self.num_alns):
 
             # For each reference/query alignment terminus, determine if it is close to the sequence terminus
