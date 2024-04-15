@@ -397,15 +397,15 @@ def main():
     # Check if any alignments are left
     if not ctg_alns:
         raise RuntimeError("There are no alignments. Check '{}'.".format(output_path + file_prefix + ".asm.paf"))
-"""
-Ok this is going to be a big set of edits:
-
-The original code is shown in the 'else' block within for i in ctg_alns:
-THE ISSUE HERE IS ContigAlignment.UNIQUE_ANCHOR_FILTER()
-
-currently my method does not check for unique anchors. I need to test filtering these AFTER the filter and merge,
-and I need to test checking each one individually
-"""
+    """
+    Ok this is going to be a big set of edits:
+    
+    The original code is shown in the 'else' block within for i in ctg_alns:
+    THE ISSUE HERE IS ContigAlignment.UNIQUE_ANCHOR_FILTER()
+    
+    currently my method does not check for unique anchors. I need to test filtering these AFTER the filter and merge,
+    and I need to test checking each one individually
+    """
     # Filter the alignments
     unfiltered_strings, filtered_strings, merged_strings, useful_strings = [], [], [], []
     log("INFO", "Filtering and merging alignments")
