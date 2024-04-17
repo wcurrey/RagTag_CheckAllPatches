@@ -1,5 +1,25 @@
 """
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
+# Apr. 17, 2024
+These changes have given us the ability to better test how 
+inputs impact alignments against the reference. I'm now 
+testing the downstream SNP variant calling and phasing on 
+the assemblies to compare accuracy, and plan to run sniffles2
+to check the structural integrity. We may be able to leave 
+the original alignment filtering in place. With that in mind,
+I'm continuing this branch with the intent of using the 
+AGPFile class to help facilitate merging the annotations
+from this and other software we're using (longstitch/ntLink).
+These annotations will be output as a bedfile for viewing in 
+IGV.
+
+Doing so will allow us to visualize what breakpoints 
+correspond to the read-based and reference-based scaffolding
+and gap-filling.
+
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
 # Apr. 15, 2024
 ran debug patch
 saw there were still plenty of good alignments at the merge
