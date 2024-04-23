@@ -17,6 +17,10 @@ Doing so will allow us to visualize what breakpoints
 correspond to the read-based and reference-based scaffolding
 and gap-filling.
 
+Noticed that while they have the same contigs together, 
+ARKS orders ntLink1 - ntLink0 - tig0000004, RagTag scaffold
+does it tig0000004 - ntLink0 - ntLink1 when operating on 
+ntLink-only scaffolds and gapfills
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ #
